@@ -1,0 +1,24 @@
+# Mac
+**/.DS_Store
+.AppleDouble
+.LSOverride
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Pyenv
+.python-version
+
+# dotenv
+.env
+
+# virtualenv
+.venv
+venv/
+ENV/
+
+# Vscode setting
+.vscode
+
+# Cache
+**__pycache__
