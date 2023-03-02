@@ -206,15 +206,11 @@ class Nasdaq100:
     def get_company_names(self) -> List[str]:
 
         if not all(ticker in self.mapping for ticker in self.tickers):
-            not_found = [ticker for ticker in self.tickers if ticker not in self.mapping]
+            not_found = [
+                ticker for ticker in self.tickers if ticker not in self.mapping]
             raise KeyError(
                 f"Invalid ticker: {not_found}. Please use a valid ticker from the Nasdaq 100 index.")
 
         company_names = [self.mapping[key] for key in self.tickers]
 
         return company_names
-
-if __name__ == '__main__':
-    tickers = ['nigger']
-    company_names = Nasdaq100(tickers).get_company_names()
-    print(company_names)
