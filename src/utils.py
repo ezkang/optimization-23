@@ -7,10 +7,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from pypfopt.plotting import plot_efficient_frontier
 
+import yfinance as yf
+
 # ----------------- Plotting function for efficient frontier ----------------- #
 
 
-def custom_efficient_frontier(ef, show_assets=True, figsize=(12, 10)):
+def custom_efficient_frontier(ef, risk_free_rate, show_assets=True, figsize=(12, 10)):
 
     # Create a copy of the efficient frontier class instance
     ef_copy = copy.deepcopy(ef)
@@ -26,7 +28,7 @@ def custom_efficient_frontier(ef, show_assets=True, figsize=(12, 10)):
     plot_efficient_frontier(ef_copy, ax=ax, show_assets=show_assets)
 
     # Find the tangency portfolio
-    ef_max_sharpe.max_sharpe()
+    ef_max_sharpe.max_sharpe(risk_free_rate=risk_free_rate)
     ret_tangent, std_tangent, _ = ef_max_sharpe.portfolio_performance()
     ax.scatter(std_tangent, ret_tangent, marker="*",
                s=200, c="r", label="Max Sharpe")
@@ -341,3 +343,26 @@ class Nasdaq100:
         industries = [self.industries[key] for key in self.tickers]
 
         return industries
+
+    def get_prices(self, date: str) -> List[float]:
+        if not all(ticker in self.mapping for ticker in self.tickers):
+            not_found = [
+                ticker for ticker in self.tickers if ticker not in self.mapping]
+            raise KeyError(
+                f"Invalid ticker: {not_found}. Please use a valid ticker from the Nasdaq 100 index.")
+
+        # End date is the next day to ensure that the last day is included
+        end_date = (pd.to_datetime(date) +
+                    pd.to_timedelta(1, unit='d')).strftime('%Y-%m-%d')
+
+        prices = yf.download(
+            tickers=' '.join(self.tickers),
+            start=date,
+            end=end_date,
+            show_errors=False
+        )['Open']
+
+        if prices.shape[0] == 0:
+            raise ValueError(f"Invalid date: {date}. No data for given date.")
+
+        return prices
